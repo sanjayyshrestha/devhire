@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code, Mail, Lock, User, ArrowRight } from "lucide-react";
+import { redirect } from "next/navigation";
 
 export default function Auth() {
   const [isLoading, setIsLoading] = useState(false);
@@ -16,6 +17,7 @@ export default function Auth() {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
+      redirect('/select-role')
     }, 1000);
   };
 

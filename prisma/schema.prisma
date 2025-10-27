@@ -12,3 +12,102 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+enum Role{
+  DEVELOPER
+  CLIENT
+  ADMIN
+}
+
+enum ProjectStatus{
+  ACTIVE
+  IN_PROGRESS
+  COMPLETED
+}
+
+enum ApplicationStatus{
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+model User{
+  id String @id @default(uuid())
+  email String @unique
+  password String 
+  role Role 
+  createdAt DateTime @default(now())
+
+  developer Developer?
+  client Client?
+  
+}
+
+model Developer{
+  userId String @id
+  user User @relation(fields: [userId],references: [id])
+  name String
+  bio String?
+  avatar String?
+  //relations
+  skills Skill[] @relation("DeveloperSkills")//developer can have many skills
+  hiredProjects Project[] //developer can be hired for multiple projects
+  application Application[] //developer can submit application in many projects
+}
+
+model Client{
+  userId String @id
+  user User @relation(fields: [userId],references: [id])
+  companyName String
+  bio String?
+  logo String?
+ //relation
+  project Project[] @relation("ClientProject")//client can have or create multiple projects
+}
+
+model Skill{
+  id String @id @default(uuid())
+  name String @unique
+  //relation
+  developers Developer[] @relation("DeveloperSkills")//multiple skills can belong to multiple developer
+}
+
+
+
+model Project{
+  id String @id @default(uuid())
+  title String
+  description String
+  budget Int
+  techStack String[]
+  duration String
+  status ProjectStatus
+  //relations
+  clientId String
+  client Client @relation("ClientProject",fields: [clientId],references: [userId])//each project belongs to a client
+
+  hiredDevId String?
+  developer Developer? @relation(fields: [hiredDevId],references: [userId])//project can be appointed to one developer
+  
+  application Application[]//one project can have multiple applications
+
+  createdAt DateTime @default(now())
+}
+
+
+model Application{
+  id String @id @default(uuid())
+  message String
+  expectedPay Int
+  proposedTimeline String
+  status ApplicationStatus @default(PENDING)
+  //relations
+  developerId String
+  developer Developer @relation(fields: [developerId],references: [userId])//each application belongs to developer
+
+  projectId String
+  project Project @relation(fields: [projectId],references: [id])//each application belongs to project
+
+   createdAt DateTime @default(now())
+  @@unique([developerId,projectId])
+}
