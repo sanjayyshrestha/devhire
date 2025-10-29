@@ -93,7 +93,7 @@ model Application{
   id String @id @default(uuid())
   message String
   expectedPay Int
-  proposedTimeline String
+  proposedTimeline Int
   status ApplicationStatus @default(PENDING)
   //relations
   developerId String

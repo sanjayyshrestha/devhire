@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Check, X, Star, DollarSign } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { MyProjectApplication } from "@/app/dashboard/client/applications/page";
 
 const applications = [
   {
@@ -47,18 +48,21 @@ const applications = [
   },
 ];
 
-export default function ClientApplications() {
-  const pendingApps = applications.filter((app) => app.status === "pending");
-  const acceptedApps = applications.filter((app) => app.status === "accepted");
-  const rejectedApps = applications.filter((app) => app.status === "rejected");
+export default function ClientApplications({applications}:{
+  applications:MyProjectApplication
+}) {
+  const pendingApps = applications.filter((app) => app.status === "PENDING");
+  const acceptedApps = applications.filter((app) => app.status === "ACCEPTED");
+  const rejectedApps = applications.filter((app) => app.status === "REJECTED");
 
   const ApplicationCard = ({ app }: { app: typeof applications[0] }) => (
     <Card>
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
           <Avatar className="h-12 w-12">
+            {/* TODO: Handle image for client application page  */}
             <AvatarFallback className="bg-primary text-primary-foreground">
-              {app.developer.initials}
+              {app.developer.name}
             </AvatarFallback>
           </Avatar>
           <div className="flex-1 space-y-3">
@@ -66,9 +70,9 @@ export default function ClientApplications() {
               <div className="flex items-start justify-between">
                 <div>
                   <h3 className="font-semibold text-lg">{app.developer.name}</h3>
-                  <p className="text-sm text-muted-foreground">Applied to: {app.project}</p>
+                  <p className="text-sm text-muted-foreground">Applied to: {app.project.title}</p>
                 </div>
-                {app.status === "pending" && (
+                {app.status === "PENDING" && (
                   <div className="flex gap-2">
                     <Button size="sm" variant="default">
                       <Check className="h-4 w-4 mr-1" />
@@ -80,24 +84,24 @@ export default function ClientApplications() {
                     </Button>
                   </div>
                 )}
-                {app.status === "accepted" && <Badge>Accepted</Badge>}
-                {app.status === "rejected" && <Badge variant="secondary">Rejected</Badge>}
+                {app.status === "ACCEPTED" && <Badge>Accepted</Badge>}
+                {app.status === "REJECTED" && <Badge variant="secondary">Rejected</Badge>}
               </div>
               <div className="flex items-center gap-4 mt-2">
-                <div className="flex items-center gap-1">
+                {/* <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
                   <span className="text-sm font-medium">{app.developer.rating}</span>
-                </div>
-                <span className="text-sm text-muted-foreground">
+                </div> */}
+                {/* <span className="text-sm text-muted-foreground">
                   {app.developer.completedProjects} projects completed
-                </span>
+                </span> */}
               </div>
             </div>
             <div className="space-y-2">
-              <p className="text-sm">{app.coverMessage}</p>
+              <p className="text-sm">{app.message}</p>
               <div className="flex items-center gap-2">
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
-                <span className="font-semibold">{app.expectedRate}</span>
+                <span className="font-semibold">{app.expectedPay}</span>
                 <span className="text-sm text-muted-foreground">expected rate</span>
               </div>
             </div>

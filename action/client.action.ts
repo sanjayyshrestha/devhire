@@ -1,7 +1,7 @@
 'use server'
 
 import { prisma } from "@/lib/prisma";
-import { getRole, getUserId } from "./user.action"
+import { getRole, getUser, getUserId } from "./user.action"
 import { revalidatePath } from "next/cache";
 
 
@@ -50,7 +50,6 @@ export async function createProject(formData:FormData){
   }
 }
 
-
 export async function getProjects(){
   const userId=await getUserId();
 
@@ -72,4 +71,73 @@ export async function getProjects(){
   } catch (error) {
     console.log('Error in getting project : ',error)
   }
+}
+
+export async function getClientDashboardData(){
+const userId=await getUserId();
+const user=await getUser()
+console.log('User : ',user)
+  const [totalProjects,totalApplications,totalHiredDevs,recentProjects]=await prisma.$transaction([
+    prisma.project.count({
+      where:{clientId:userId}
+    }),
+
+    prisma.application.count({
+      where:{
+        project:{
+          clientId:userId
+        }
+      }
+    }),
+
+    prisma.project.count({
+      where:{
+      clientId:userId,
+       hiredDevId:{
+        not:null
+       }
+      }
+    }),
+
+    prisma.project.findMany({
+      where:{clientId:userId},
+      orderBy:{
+        createdAt:'desc'
+      },
+      include:{
+        _count:{
+          select:{
+            application:true
+          }
+        }
+      },
+      take:3
+    })
+  ])
+
+  return {
+    totalProjects,totalApplications,totalHiredDevs,recentProjects
+  }
+}
+
+
+export async function getMyProjectApplications(){
+const userId=await getUserId();
+  const applications=await prisma.application.findMany({
+    where:{project:{clientId:userId}},
+    include:{
+      project:{
+        select:{
+          title:true
+        },
+      },
+      developer:{
+        select:{
+          name:true
+        }
+      }
+    }
+  })
+
+  return applications
 }
