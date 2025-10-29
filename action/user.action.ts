@@ -1,6 +1,6 @@
 'use server'
 
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
@@ -47,20 +47,30 @@ export async function signinUser(formData:FormData){
 
     try {
 
-    await signIn('credentials',{
+  await signIn('credentials',{
       redirect:false,
       callbackUrl:'/',
       email,
       password
     })
+      
+    
+    const user = await prisma.user.findUnique({ where: { email } });
+      return {
+        success: true,
+        role: user?.role,
+      };
+  
 
-    return {
-      success:true
-    }
 
   } catch (error) {
+    
     const err=error as Error
     console.log(err.cause)
+    
+    return {
+      success:false
+    }
   }
 
   // redirect('/')
@@ -152,4 +162,16 @@ export async function saveUserProfile(formData: FormData) {
     console.error("❌ Error saving profile:", error);
     return { success: false, message: "Failed to save profile." };
   }
+}
+
+
+
+export async function getRole(){
+  const session=await auth();
+  return session?.user.role
+}
+
+export async function getUserId(){
+const session=await auth();
+return session?.user.id;
 }

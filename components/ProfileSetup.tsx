@@ -107,7 +107,7 @@ export default function ProfileSetup() {
 
       if (result.success) {
         toast.success(result.message);
-        router.push(`/profile?role=${role}`);
+        router.push(`/dashboard/${role}`);
       } else {
         toast.error(result.message);
       }

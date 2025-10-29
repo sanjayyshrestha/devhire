@@ -72,10 +72,9 @@ export default function Auth() {
         const formData = new FormData();
         formData.append("email", signinData.email);
         formData.append("password", signinData.password);
-
         const res = await signinUser(formData);
         if (res?.success) {
-          router.push("/dashboard");
+          router.push(`/dashboard/${res.role?.toLocaleLowerCase()}`);
         } else {
           toast.error('Invalid credentials')
         }

@@ -74,7 +74,7 @@ model Project{
   description String
   budget Int
   techStack String[]
-  duration String
+  duration Int
   status ProjectStatus
   //relations
   clientId String
