@@ -101,8 +101,9 @@ export default function BrowseProjects({ devProjects: projects }: { devProjects:
 
       {/* Project Cards */}
       <div className="grid gap-6 md:grid-cols-2">
-        {projects.map((project) => (
-          <Card key={project.id} className="hover:shadow-lg transition-shadow">
+        {projects.map((project) => {
+          const status=project.application[0]?.status ?? null
+          return  <Card key={project.id} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
@@ -131,7 +132,6 @@ export default function BrowseProjects({ devProjects: projects }: { devProjects:
                   <span>{project.duration} days</span>
                 </div>
               </div>
-
               <div className="flex flex-wrap gap-2">
                 {project.techStack.map((tag) => (
                   <Badge key={tag} variant="outline">
@@ -140,14 +140,30 @@ export default function BrowseProjects({ devProjects: projects }: { devProjects:
                 ))}
               </div>
 
-              <Button className="w-full" onClick={() => handleApply(project)}>
-                Apply Now
-              </Button>
+<Button
+  className="w-full"
+  disabled={!!status} // disable only if already applied
+  onClick={() => handleApply(project)}
+  variant={
+    status === "PENDING"
+      ? "secondary"
+      : status === "REJECTED"
+      ? "destructive"
+      : status === "ACCEPTED"
+      ? "secondary"
+      : "default"
+  }
+>
+  {status === "PENDING" && "Applied"}
+  {status === "REJECTED" && "Rejected"}
+  {status === "ACCEPTED" && "Accepted"}
+  {!status && "Apply Now"}
+</Button>
             </CardContent>
           </Card>
-        ))}
+        })}
       </div>
-
+ 
       {/* Apply Dialog */}
       <Dialog open={isApplyOpen} onOpenChange={setIsApplyOpen}>
         <DialogContent className="max-w-2xl">

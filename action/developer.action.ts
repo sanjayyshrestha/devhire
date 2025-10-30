@@ -5,11 +5,20 @@ import { revalidatePath } from "next/cache";
 import { getRole, getUserId } from "./user.action";
 
 export async function getProjectsForDev(){
+  const userId=await getUserId();
   const projects=await prisma.project.findMany({
+    where:{hiredDevId:null},
     include:{
       client:{
         select:{
           companyName:true
+        }
+      },
+      application:{
+        where:{developerId:userId},
+        select:{
+          id:true,
+          status:true
         }
       }
     }

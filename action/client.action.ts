@@ -141,3 +141,67 @@ const userId=await getUserId();
 
   return applications
 }
+
+export async function acceptApplication(applicationId:string){
+
+  const application=await prisma.application.findUnique({
+    where:{
+      id:applicationId
+    },
+    include:{
+      project:true
+    }
+  })
+
+   if(!application) throw new Error("Application Not Found")
+
+    await prisma.application.update({
+      where:{id:applicationId},
+      data:{
+        status:'ACCEPTED'
+      }
+    })
+
+    
+    await prisma.project.update({
+      where:{
+        id:application.projectId
+      },
+      data:{
+        hiredDevId:application.developerId,
+        status:'IN_PROGRESS'
+      }
+    })
+
+    await prisma.application.updateMany({
+      where:{
+       projectId:application.projectId,
+      id:{
+        not:applicationId
+      }
+      },
+      data:{
+        status:'REJECTED'
+      }
+    })
+    revalidatePath('/dashboard/client/applications')
+    return { success: true, message: "Developer accepted for project" };
+
+}
+
+export async function declineApplication(applicationId:string){
+
+  await prisma.application.update({
+    where:{id:applicationId},
+    data:{
+      status:"REJECTED"
+    }
+  })
+
+  revalidatePath('/dashboard/client/applications')
+
+  return{
+    success:true,
+    message:"Application declined successfully"
+  }
+}

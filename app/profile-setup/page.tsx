@@ -1,7 +1,7 @@
 import ProfileSetup from '@/components/ProfileSetup'
 import React from 'react'
 
-const ProfileSetupPage = () => {
+const ProfileSetupPage = async () => {
   return (
     <div>
       <ProfileSetup/>

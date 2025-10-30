@@ -19,7 +19,7 @@ const menuItems = [
   { title: "Dashboard", url: "/dashboard/developer", icon: LayoutDashboard },
   { title: "Browse Projects", url: "/dashboard/developer/browse", icon: Search },
   { title: "My Applications", url: "/dashboard/developer/applications", icon: FileText },
-  { title: "Profile", url: "/profile", icon: User },
+  { title: "Profile", url: "/dashboard/profile", icon: User },
   { title: "Settings", url: "/settings", icon: Settings },
 ];
 

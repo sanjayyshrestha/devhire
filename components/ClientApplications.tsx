@@ -1,3 +1,4 @@
+'use client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -5,48 +6,8 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Check, X, Star, DollarSign } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MyProjectApplication } from "@/app/dashboard/client/applications/page";
-
-const applications = [
-  {
-    id: 1,
-    project: "E-commerce Platform Redesign",
-    developer: {
-      name: "Sarah Johnson",
-      initials: "SJ",
-      rating: 4.9,
-      completedProjects: 48,
-    },
-    coverMessage: "I have 5+ years of experience building e-commerce platforms with React and Node.js...",
-    expectedRate: "$6,500",
-    status: "pending",
-  },
-  {
-    id: 2,
-    project: "E-commerce Platform Redesign",
-    developer: {
-      name: "Michael Chen",
-      initials: "MC",
-      rating: 4.8,
-      completedProjects: 32,
-    },
-    coverMessage: "Full-stack developer specializing in scalable e-commerce solutions...",
-    expectedRate: "$7,000",
-    status: "pending",
-  },
-  {
-    id: 3,
-    project: "Mobile App MVP",
-    developer: {
-      name: "Emily Davis",
-      initials: "ED",
-      rating: 5.0,
-      completedProjects: 25,
-    },
-    coverMessage: "Expert in React Native with a proven track record of successful MVPs...",
-    expectedRate: "$9,500",
-    status: "accepted",
-  },
-];
+import { acceptApplication, declineApplication } from "@/action/client.action";
+import toast from "react-hot-toast";
 
 export default function ClientApplications({applications}:{
   applications:MyProjectApplication
@@ -55,6 +16,30 @@ export default function ClientApplications({applications}:{
   const acceptedApps = applications.filter((app) => app.status === "ACCEPTED");
   const rejectedApps = applications.filter((app) => app.status === "REJECTED");
 
+  const handleAccept=async (applicationId:string)=>{
+  
+    try {
+     const result= await acceptApplication(applicationId)
+
+     if(result.success){
+      toast.success(result.message)
+     }
+    } catch (error) {
+      console.log('Error in accepting application : ',error)
+    }
+  }
+
+  const handleDecline=async (applicationId:string)=>{
+  
+    try {
+     const result= await declineApplication(applicationId)
+     if(result.success){
+      toast.success(result.message)
+     }
+    } catch (error) {
+      console.log('Error in declining application : ',error)
+    }
+  }
   const ApplicationCard = ({ app }: { app: typeof applications[0] }) => (
     <Card>
       <CardContent className="p-6">
@@ -74,11 +59,11 @@ export default function ClientApplications({applications}:{
                 </div>
                 {app.status === "PENDING" && (
                   <div className="flex gap-2">
-                    <Button size="sm" variant="default">
+                    <Button type="button" onClick={()=>handleAccept(app.id)} size="sm" variant="default">
                       <Check className="h-4 w-4 mr-1" />
                       Accept
                     </Button>
-                    <Button size="sm" variant="outline">
+                    <Button type="button" onClick={()=>handleDecline(app.id)} size="sm" variant="outline">
                       <X className="h-4 w-4 mr-1" />
                       Decline
                     </Button>

@@ -35,6 +35,12 @@ export async function signupUser(formData:FormData){
     }
   })
 
+ await signIn('credentials',{
+   email,
+   password,
+   redirect:false,
+    })
+
 return {
   success:true,
   userId:user.id
@@ -54,7 +60,6 @@ export async function signinUser(formData:FormData){
       password
     })
       
-    
     const user = await prisma.user.findUnique({ where: { email } });
       return {
         success: true,
@@ -179,4 +184,67 @@ return session?.user.id;
 export async function getUser(){
   const session=await auth();
   return session?.user
+}
+
+
+
+export async function getProfileData(userId: string) {
+  try {
+    // Fetch the user and include their role-specific profile
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        createdAt: true,
+        developer: {
+          select: {
+            name: true,
+            bio: true,
+            avatar: true,
+            skills: true,
+          },
+        },
+        client: {
+          select: {
+            companyName: true,
+            bio: true,
+            logo: true,
+          },
+        },
+      },
+    });
+
+    if (!user) throw new Error("User not found");
+
+    // Transform into a unified profile format for your frontend
+    if (user.role === "DEVELOPER" && user.developer) {
+      return {
+        id: user.id,
+        role: user.role,
+        name: user.developer.name,
+        bio: user.developer.bio || "",
+        avatar: user.developer.avatar || "",
+        skills: user.developer.skills || [],
+        email: user.email,
+        joinedDate: user.createdAt.toISOString(),
+      };
+    } else if (user.role === "CLIENT" && user.client) {
+      return {
+        id: user.id,
+        role: user.role,
+        companyName: user.client.companyName,
+        bio: user.client.bio || "",
+        logo: user.client.logo || "",
+        email: user.email,
+        joinedDate: user.createdAt.toISOString(),
+      };
+    }
+
+    return null;
+  } catch (error) {
+    console.error("Error fetching profile:", error);
+    return null;
+  }
 }
