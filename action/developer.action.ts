@@ -106,6 +106,31 @@ export async function getMyAppliedProjects(){
   return applications;
 }
 
+export async function getDeveloperDashboardData(){
+  const userId=await getUserId();
+  
+ const [availableProjects,myApplications,acceptedApplication] =await prisma.$transaction([
+  
+  prisma.project.count({
+    where:{status:'ACTIVE'}
+  }),
+  prisma.application.count({
+    where:{developerId:userId}
+  }),
+
+  prisma.application.count({
+    where:{
+      developerId:userId,
+      status:"ACCEPTED"
+    }
+  })
+  ])
+
+  return {
+    availableProjects,myApplications,acceptedApplication
+  }
+}
+
 export async function getDeveloperProfileData(userId:string){
 
   
@@ -125,7 +150,6 @@ export async function getDeveloperProfileData(userId:string){
   return user;
  
 }
-
 
 export async function updateDeveloperProfileData(input: UpdateDeveloperProfileInput) {
   try {

@@ -84,7 +84,6 @@ export async function getProjects(){
 export async function getClientDashboardData(){
 const userId=await getUserId();
 const user=await getUser()
-console.log('User : ',user)
   const [totalProjects,totalApplications,totalHiredDevs,recentProjects]=await prisma.$transaction([
     prisma.project.count({
       where:{clientId:userId}
