@@ -4,6 +4,14 @@ import { prisma } from "@/lib/prisma";
 import { getRole, getUser, getUserId } from "./user.action"
 import { revalidatePath } from "next/cache";
 
+interface UpdateClientProfileInput {
+  userId: string;
+  bio?: string;
+  companyName?: string;
+  logo?: string;
+  location?: string; // if you add this field later
+}
+
 
 export async function createProject(formData:FormData){
   const role=await getRole();
@@ -203,5 +211,61 @@ export async function declineApplication(applicationId:string){
   return{
     success:true,
     message:"Application declined successfully"
+  }
+}
+
+export async function getClientProfileData(userId:string){
+
+  
+ const user= await prisma.client.findUnique({
+    where:{userId},
+    include:{
+      user:true,
+      _count:{
+        select:{
+          project:true,
+        },
+      },
+    }
+  })
+
+  const activeProject=await prisma.project.count({
+    where:{clientId:userId,status:'ACTIVE'},
+  })
+  
+  return {user,activeProject};
+}
+
+export async function updateClientProfileData({
+  userId,
+  bio,
+  companyName,
+  logo,
+}: UpdateClientProfileInput) {
+  try {
+    const updatedProfile = await prisma.client.update({
+      where: { userId },
+      data: {
+        bio,
+        companyName,
+        logo,
+      },
+      include: {
+        user: true, // to return user email, createdAt, etc.
+      },
+    });
+
+
+    return {
+      success: true,
+      message:"Profile Update successfully",
+      data: updatedProfile,
+    };
+  } catch (error: any) {
+    console.error("Error updating client profile:", error);
+    return {
+      success: false,
+      message: error.message || "Failed to update client profile.",
+    };
   }
 }

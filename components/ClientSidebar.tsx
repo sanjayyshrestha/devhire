@@ -25,8 +25,7 @@ const menuItems: MenuItem[] = [
   { title: "Dashboard", url: "/dashboard/client", icon: LayoutDashboard },
   { title: "My Projects", url: "/dashboard/client/projects", icon: FolderKanban },
   { title: "Applications", url: "/dashboard/client/applications", icon: FileText },
-  { title: "Profile", url: "/profile", icon: User },
-  { title: "Settings", url: "/settings", icon: Settings },
+  { title: "Profile", url: "/dashboard/client/profile", icon: User },
 ];
 
 export function ClientSidebar() {
