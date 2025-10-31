@@ -116,6 +116,7 @@ export default function ClientProfile({
         </div>
 
         {/* Profile Card */}
+        {/* TODO:ADD A FEATURE TO UPDATE CLIENT PROFILE IMAGE  */}
         <Card>
           <CardHeader className="border-b bg-muted/30">
             <div className="flex items-start gap-6">

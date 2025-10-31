@@ -226,6 +226,7 @@ export default function ClientProjects({projects}:{
                   </TableCell>
                   <TableCell>{project._count.application} received</TableCell>
                   <TableCell className="text-right">
+                    {/* TODO:CREATE A ACTION FOR VIEW,EDIT AND DELETE  */}
                     <div className="flex justify-end gap-2">
                       <Button variant="ghost" size="icon">
                         <Eye className="h-4 w-4" />

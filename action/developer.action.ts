@@ -3,6 +3,13 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache";
 import { getRole, getUserId } from "./user.action";
+interface UpdateDeveloperProfileInput {
+  userId: string;
+  name?: string;
+  bio?: string;
+  avatar?: string;
+  skills?: string[];
+}
 
 export async function getProjectsForDev(){
   const userId=await getUserId();
@@ -97,4 +104,48 @@ export async function getMyAppliedProjects(){
   })
 
   return applications;
+}
+
+export async function getDeveloperProfileData(userId:string){
+
+  
+  const user= await prisma.developer.findUnique({
+    where:{userId},
+    include:{
+      user:true,
+      _count:{
+        select:{
+          application:true,
+          hiredProjects:true
+        }
+      }
+    }
+  })
+
+  return user;
+ 
+}
+
+
+export async function updateDeveloperProfileData(input: UpdateDeveloperProfileInput) {
+  try {
+    if (!input.userId) {
+      return { success: false, message: "User ID is required" };
+    }
+
+    const updated = await prisma.developer.update({
+      where: { userId: input.userId },
+      data: {
+        name: input.name,
+        bio: input.bio,
+        avatar: input.avatar,
+        skills: input.skills,
+      },
+    });
+
+    return { success: true, message: "Profile updated successfully", data: updated };
+  } catch (error: any) {
+    console.error("Failed to update developer profile:", error);
+    return { success: false, message: error?.message || "Server error" };
+  }
 }
