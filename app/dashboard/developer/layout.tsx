@@ -13,6 +13,8 @@ import {
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ClientSidebar } from "@/components/ClientSidebar";
 import DeveloperSidebar from "@/components/DeveloperSidebar";
+import { getUser, signoutUser } from "@/action/user.action";
+import { redirect } from "next/navigation";
 
 
 interface DashboardLayoutProps {
@@ -20,7 +22,9 @@ interface DashboardLayoutProps {
   // sidebar: ReactNode;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default async function DashboardLayout({ children }: DashboardLayoutProps) {
+  const user=await getUser();
+  if(!user || user.role!=='DEVELOPER') redirect('/');
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">
@@ -49,7 +53,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Sign Out</DropdownMenuItem>
+                <DropdownMenuItem onClick={signoutUser}>Sign Out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </header>

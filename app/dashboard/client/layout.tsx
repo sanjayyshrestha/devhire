@@ -12,13 +12,17 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ClientSidebar } from "@/components/ClientSidebar";
+import { getUser } from "@/action/user.action";
+import { redirect } from "next/navigation";
 
 interface DashboardLayoutProps {
   children: ReactNode;
   // sidebar: ReactNode;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default async function DashboardLayout({ children }: DashboardLayoutProps) {
+  const user=await getUser();
+    if(!user || user.role!=='CLIENT') redirect('/');
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">

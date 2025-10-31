@@ -1,6 +1,6 @@
 'use server'
 
-import { auth, signIn } from "@/auth";
+import { auth, signIn, signOut } from "@/auth";
 import { prisma } from "@/lib/prisma"
 import bcrypt from "bcryptjs";
 import { redirect } from "next/navigation";
@@ -81,6 +81,9 @@ export async function signinUser(formData:FormData){
   // redirect('/')
 }
 
+export async function signoutUser(){
+  await signOut()
+}
 export async function selectRole(userId:string,role:"DEVELOPER" | "CLIENT"){
 try {
     await prisma.user.update({
