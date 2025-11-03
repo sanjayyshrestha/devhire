@@ -1,5 +1,5 @@
 'use client'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { MyProjectApplication } from "@/app/dashboard/client/applications/page";
 import { acceptApplication, declineApplication } from "@/action/client.action";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 export default function ClientApplications({applications}:{
   applications:MyProjectApplication
@@ -46,6 +47,7 @@ export default function ClientApplications({applications}:{
         <div className="flex items-start gap-4">
           <Avatar className="h-12 w-12">
             {/* TODO: Handle image for client application page  */}
+            {/* <Image src={app.developer.avatar??""} className="size-12" alt="developer avatar" /> */}
             <AvatarFallback className="bg-primary text-primary-foreground">
               {app.developer.name}
             </AvatarFallback>

@@ -88,7 +88,6 @@ model Project{
   createdAt DateTime @default(now())
 }
 
-
 model Application{
   id String @id @default(uuid())
   message String

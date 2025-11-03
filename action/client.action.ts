@@ -140,7 +140,8 @@ const userId=await getUserId();
       },
       developer:{
         select:{
-          name:true
+          name:true,
+          avatar:true
         }
       }
     }

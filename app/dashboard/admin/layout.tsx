@@ -1,5 +1,6 @@
-import { ReactNode } from "react";
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import React from 'react'
 import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -11,23 +12,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import DeveloperSidebar from "@/components/DeveloperSidebar";
-import { getUser, signoutUser } from "@/action/user.action";
-import { redirect } from "next/navigation";
+import { AdminSidebar } from '@/components/AdminSidebar';
 
-
-interface DashboardLayoutProps {
-  children: ReactNode;
-  // sidebar: ReactNode;
-}
-
-export default async function DashboardLayout({ children }: DashboardLayoutProps) {
-  const user=await getUser();
-  if(!user || user.role!=='DEVELOPER') redirect('/');
+const AdminLayout = ({children}:{
+  children:React.ReactNode
+}) => {
   return (
-    <SidebarProvider>
+   <SidebarProvider>
       <div className="flex min-h-screen w-full">
-       <DeveloperSidebar/>
+         <AdminSidebar/>
         <div className="flex-1 flex flex-col">
           <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-background px-6">
             <SidebarTrigger />
@@ -52,7 +45,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
                 <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={signoutUser}>Sign Out</DropdownMenuItem>
+                <DropdownMenuItem>Sign Out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </header>
@@ -60,5 +53,7 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
         </div>
       </div>
     </SidebarProvider>
-  );
+  )
 }
+
+export default AdminLayout
