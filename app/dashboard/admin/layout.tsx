@@ -13,10 +13,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { AdminSidebar } from '@/components/AdminSidebar';
+import { getUser, signoutUser } from '@/action/user.action';
+import { redirect } from 'next/navigation';
 
-const AdminLayout = ({children}:{
+const AdminLayout =async ({children}:{
   children:React.ReactNode
 }) => {
+  const user=await getUser();
+    if(!user || user.role!=='ADMIN') redirect(`/`);
   return (
    <SidebarProvider>
       <div className="flex min-h-screen w-full">
@@ -45,7 +49,7 @@ const AdminLayout = ({children}:{
                 <DropdownMenuItem>Profile</DropdownMenuItem>
                 <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Sign Out</DropdownMenuItem>
+                <DropdownMenuItem onClick={signoutUser}>Sign Out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </header>

@@ -23,7 +23,7 @@ interface DashboardLayoutProps {
 
 export default async function DashboardLayout({ children }: DashboardLayoutProps) {
   const user=await getUser();
-  if(!user || user.role!=='DEVELOPER') redirect('/');
+  if(!user || user.role!=='DEVELOPER') redirect(`/`);
   return (
     <SidebarProvider>
       <div className="flex min-h-screen w-full">

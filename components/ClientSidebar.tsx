@@ -37,9 +37,9 @@ export function ClientSidebar() {
       <SidebarContent>
         {/* Logo / Header */}
         <div className="p-4 border-b">
-          <h2 className={`font-bold text-lg transition-opacity ${open ? "opacity-100" : "opacity-0"}`}>
+          <Link href='/' className={`font-bold text-lg transition-opacity ${open ? "opacity-100" : "opacity-0"} cursor-pointer`}>
             DevHire
-          </h2>
+          </Link>
           {!open && <div className="text-xl font-bold">DH</div>}
         </div>
 
