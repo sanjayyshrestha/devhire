@@ -47,7 +47,6 @@ const AdminLayout =async ({children}:{
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signoutUser}>Sign Out</DropdownMenuItem>
               </DropdownMenuContent>

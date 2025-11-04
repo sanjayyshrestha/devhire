@@ -45,13 +45,18 @@ export default function ClientApplications({applications}:{
     <Card>
       <CardContent className="p-6">
         <div className="flex items-start gap-4">
-          <Avatar className="h-12 w-12">
-            {/* TODO: Handle image for client application page  */}
-            {/* <Image src={app.developer.avatar??""} className="size-12" alt="developer avatar" /> */}
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              {app.developer.name}
-            </AvatarFallback>
-          </Avatar>
+          <Avatar className="h-12 w-12 relative overflow-hidden">
+  <Image
+    src={app.developer.avatar ?? ""}
+    alt="developer avatar"
+    fill
+    className="object-cover"
+  />
+  <AvatarFallback className="bg-primary text-primary-foreground">
+    {app.developer.name?.[0]}
+  </AvatarFallback>
+</Avatar>
+
           <div className="flex-1 space-y-3">
             <div>
               <div className="flex items-start justify-between">

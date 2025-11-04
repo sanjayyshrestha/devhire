@@ -10,7 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ClientSidebar } from "@/components/ClientSidebar";
 import { getUser, signoutUser } from "@/action/user.action";
 import { redirect } from "next/navigation";
@@ -38,18 +38,22 @@ export default async function DashboardLayout({ children }: DashboardLayoutProps
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon" className="rounded-full">
-                  <Avatar>
-                    <AvatarFallback className="bg-primary text-primary-foreground">
-                      <User className="h-5 w-5" />
-                    </AvatarFallback>
+                  <Avatar className="h-8 w-8">
+                    {user.client?.logo ? (
+                      <AvatarImage src={user.client.logo} alt={user.client.companyName} />
+                    ) : (
+                      <AvatarFallback className="bg-primary text-primary-foreground">
+                        <User className="h-5 w-5" />
+                      </AvatarFallback>
+                    )}
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
+              
               <DropdownMenuContent align="end" className="w-56">
                 <DropdownMenuLabel>My Account</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>Profile</DropdownMenuItem>
-                <DropdownMenuItem>Settings</DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={signoutUser}>Sign Out</DropdownMenuItem>
               </DropdownMenuContent>

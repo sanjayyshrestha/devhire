@@ -12,12 +12,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Code, Mail, Lock, User, ArrowRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signinUser, signupUser } from "@/action/user.action";
@@ -37,10 +32,10 @@ export default function Auth() {
 
   // Sign-up fields
   const [signupData, setSignupData] = useState({
-    name: "",
     email: "",
     password: "",
     confirmPassword: "",
+    role: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,14 +51,19 @@ export default function Auth() {
         }
 
         const formData = new FormData();
-        formData.append("name", signupData.name);
         formData.append("email", signupData.email);
         formData.append("password", signupData.password);
         formData.append("confirmPassword", signupData.confirmPassword);
+        formData.append("role", signupData.role);
 
         const res = await signupUser(formData);
         if (res?.success) {
-          router.push(`/select-role?userId=${res.userId}`);
+          router.push(
+            `/profile-setup?role=${signupData.role.toLowerCase()}&userId=${
+              res.userId
+            }`
+          );
+
         } else {
           alert(res?.message || "Failed to create account.");
         }
@@ -76,7 +76,7 @@ export default function Auth() {
         if (res?.success) {
           router.push(`/dashboard/${res.role?.toLocaleLowerCase()}`);
         } else {
-          toast.error('Invalid credentials')
+          toast.error("Invalid credentials");
         }
       }
     } catch (error) {
@@ -157,7 +157,10 @@ export default function Auth() {
                         placeholder="you@example.com"
                         value={signinData.email}
                         onChange={(e) =>
-                          setSigninData({ ...signinData, email: e.target.value })
+                          setSigninData({
+                            ...signinData,
+                            email: e.target.value,
+                          })
                         }
                         className="pl-10 bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-600"
                         required
@@ -167,7 +170,10 @@ export default function Auth() {
 
                   {/* Password */}
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-slate-300 text-sm">
+                    <Label
+                      htmlFor="password"
+                      className="text-slate-300 text-sm"
+                    >
                       Password
                     </Label>
                     <div className="relative">
@@ -215,6 +221,7 @@ export default function Auth() {
           </TabsContent>
 
           {/* Sign Up */}
+          {/* Sign Up */}
           <TabsContent value="signup" className="mt-6">
             <form onSubmit={handleSubmit}>
               <Card className="bg-slate-900 border-slate-800">
@@ -228,29 +235,12 @@ export default function Auth() {
                 </CardHeader>
 
                 <CardContent className="space-y-4">
-                  {/* Name */}
-                  <div className="space-y-2">
-                    <Label htmlFor="name" className="text-slate-300 text-sm">
-                      Full Name
-                    </Label>
-                    <div className="relative">
-                      <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-500" />
-                      <Input
-                        id="name"
-                        placeholder="John Doe"
-                        value={signupData.name}
-                        onChange={(e) =>
-                          setSignupData({ ...signupData, name: e.target.value })
-                        }
-                        className="pl-10 bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-600"
-                        required
-                      />
-                    </div>
-                  </div>
-
                   {/* Email */}
                   <div className="space-y-2">
-                    <Label htmlFor="signup-email" className="text-slate-300 text-sm">
+                    <Label
+                      htmlFor="signup-email"
+                      className="text-slate-300 text-sm"
+                    >
                       Email
                     </Label>
                     <div className="relative">
@@ -261,7 +251,10 @@ export default function Auth() {
                         placeholder="you@example.com"
                         value={signupData.email}
                         onChange={(e) =>
-                          setSignupData({ ...signupData, email: e.target.value })
+                          setSignupData({
+                            ...signupData,
+                            email: e.target.value,
+                          })
                         }
                         className="pl-10 bg-slate-800 border-slate-700 text-white placeholder:text-slate-500 focus:border-slate-600"
                         required
@@ -269,9 +262,38 @@ export default function Auth() {
                     </div>
                   </div>
 
+                  {/* Role Selection */}
+                  <div className="space-y-2">
+                    <Label className="text-slate-300 text-sm">
+                      Select Role
+                    </Label>
+                    <div className="flex gap-3">
+                      {["CLIENT", "DEVELOPER"].map((role) => (
+                        <Button
+                          key={role}
+                          type="button"
+                          variant={
+                            signupData.role === role ? "default" : "outline"
+                          }
+                          className={`flex-1 ${
+                            signupData.role === role
+                              ? "bg-cyan-600"
+                              : "bg-slate-800"
+                          }`}
+                          onClick={() => setSignupData({ ...signupData, role })}
+                        >
+                          {role === "CLIENT" ? "Client" : "Developer"}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Password */}
                   <div className="space-y-2">
-                    <Label htmlFor="signup-password" className="text-slate-300 text-sm">
+                    <Label
+                      htmlFor="signup-password"
+                      className="text-slate-300 text-sm"
+                    >
                       Password
                     </Label>
                     <div className="relative">
@@ -295,7 +317,10 @@ export default function Auth() {
 
                   {/* Confirm Password */}
                   <div className="space-y-2">
-                    <Label htmlFor="confirm-password" className="text-slate-300 text-sm">
+                    <Label
+                      htmlFor="confirm-password"
+                      className="text-slate-300 text-sm"
+                    >
                       Confirm Password
                     </Label>
                     <div className="relative">

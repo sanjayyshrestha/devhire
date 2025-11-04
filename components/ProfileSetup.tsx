@@ -32,8 +32,10 @@ export default function ProfileSetup() {
     name: "",
     companyName: "",
     bio: "",
-    avatar: "",
-    logo: "",
+    avatar: null as File | null,
+    avatarPreview:"" as string,
+    logo: null as File | null,
+    logoPreview:"" as string,
     skills: [] as string[],
   });
   const [currentSkill, setCurrentSkill] = useState("");
@@ -47,29 +49,25 @@ export default function ProfileSetup() {
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (role === "client") {
-        setFormData(prev => ({ ...prev, logo: reader.result as string }));
-      } else {
-        setFormData(prev => ({ ...prev, avatar: reader.result as string }));
-      }
-    };
-    reader.readAsDataURL(file);
+      const previewUrl = URL.createObjectURL(file);
+    if (role === "client") {
+      setFormData((prev) => ({ ...prev, logo: file,logoPreview:previewUrl }));
+    } else {
+      setFormData((prev) => ({ ...prev, avatar: file ,avatarPreview:previewUrl}));
+    }
   };
 
   const addSkill = () => {
     const skill = currentSkill.trim();
     if (!skill || formData.skills.includes(skill)) return;
-    setFormData(prev => ({ ...prev, skills: [...prev.skills, skill] }));
+    setFormData((prev) => ({ ...prev, skills: [...prev.skills, skill] }));
     setCurrentSkill("");
   };
 
   const removeSkill = (skill: string) => {
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      skills: prev.skills.filter(s => s !== skill),
+      skills: prev.skills.filter((s) => s !== skill),
     }));
   };
 
@@ -86,9 +84,7 @@ export default function ProfileSetup() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!userId) return toast.error("User ID missing.");
-
     setIsSubmitting(true);
-
     try {
       const submission = new FormData();
       submission.append("userId", userId);
@@ -96,11 +92,11 @@ export default function ProfileSetup() {
       submission.append("bio", formData.bio);
       if (role === "developer") {
         submission.append("name", formData.name);
-        submission.append("avatar", formData.avatar);
+        if (formData.avatar) submission.append("avatar", formData.avatar);
         submission.append("skills", formData.skills.join(","));
       } else {
         submission.append("companyName", formData.companyName);
-        submission.append("logo", formData.logo);
+        if (formData.logo) submission.append("logo", formData.logo);
       }
 
       const result = await saveUserProfile(submission);
@@ -138,7 +134,9 @@ export default function ProfileSetup() {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle>Profile Setup</CardTitle>
-                <CardDescription>Fill in your information below</CardDescription>
+                <CardDescription>
+                  Fill in your information below
+                </CardDescription>
               </div>
               <Badge variant="outline" className="capitalize">
                 {role}
@@ -151,16 +149,21 @@ export default function ProfileSetup() {
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Profile Image */}
               <div className="space-y-2">
-                <Label>{role === "client" ? "Company Logo" : "Profile Image"}</Label>
+                <Label>
+                  {role === "client" ? "Company Logo" : "Profile Image"}
+                </Label>
                 <div className="flex items-center gap-4">
                   <Avatar className="h-24 w-24">
                     <AvatarImage
-                      src={role === "client" ? formData.logo : formData.avatar}
+                      src={role === "client" ? formData.logoPreview : formData.avatarPreview}
                     />
                     <AvatarFallback className="bg-primary/10 text-primary text-2xl">
-                      {(
-                        role === "client" ? formData.companyName : formData.name
-                      ).charAt(0).toUpperCase() || "?"}
+                      {(role === "client"
+                        ? formData.companyName
+                        : formData.name
+                      )
+                        .charAt(0)
+                        .toUpperCase() || "?"}
                     </AvatarFallback>
                   </Avatar>
 
@@ -193,11 +196,19 @@ export default function ProfileSetup() {
                 <Input
                   id="name"
                   placeholder={role === "client" ? "Acme Inc." : "John Doe"}
-                  value={role === "client" ? formData.companyName : formData.name}
+                  value={
+                    role === "client" ? formData.companyName : formData.name
+                  }
                   onChange={(e) =>
                     role === "client"
-                      ? setFormData(prev => ({ ...prev, companyName: e.target.value }))
-                      : setFormData(prev => ({ ...prev, name: e.target.value }))
+                      ? setFormData((prev) => ({
+                          ...prev,
+                          companyName: e.target.value,
+                        }))
+                      : setFormData((prev) => ({
+                          ...prev,
+                          name: e.target.value,
+                        }))
                   }
                   required
                 />
@@ -214,7 +225,9 @@ export default function ProfileSetup() {
                       : "Tell developers about your company and the types of projects you work on..."
                   }
                   value={formData.bio}
-                  onChange={(e) => setFormData(prev => ({ ...prev, bio: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, bio: e.target.value }))
+                  }
                   rows={4}
                   required
                 />
@@ -237,14 +250,22 @@ export default function ProfileSetup() {
                         }
                       }}
                     />
-                    <Button type="button" onClick={addSkill} variant="secondary">
+                    <Button
+                      type="button"
+                      onClick={addSkill}
+                      variant="secondary"
+                    >
                       Add
                     </Button>
                   </div>
                   {formData.skills.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-3">
-                      {formData.skills.map(skill => (
-                        <Badge key={skill} variant="secondary" className="px-3 py-1">
+                      {formData.skills.map((skill) => (
+                        <Badge
+                          key={skill}
+                          variant="secondary"
+                          className="px-3 py-1"
+                        >
                           {skill}
                           <button
                             type="button"
@@ -262,10 +283,19 @@ export default function ProfileSetup() {
 
               {/* Buttons */}
               <div className="flex gap-3 pt-4">
-                <Button type="button" variant="outline" onClick={() => router.back()} className="flex-1">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.back()}
+                  className="flex-1"
+                >
                   Back
                 </Button>
-                <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                <Button
+                  type="submit"
+                  className="flex-1"
+                  disabled={isSubmitting}
+                >
                   {isSubmitting ? "Saving..." : "Complete Setup"}
                 </Button>
               </div>

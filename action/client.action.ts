@@ -3,6 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { getRole, getUser, getUserId } from "./user.action"
 import { revalidatePath } from "next/cache";
+import { ProjectStatus } from "@prisma/client";
 
 interface UpdateClientProfileInput {
   userId: string;
@@ -269,3 +270,79 @@ export async function updateClientProfileData({
     };
   }
 }
+
+export async function deleteProject(id: string) { 
+  const userId=await getUserId();
+
+  const project=await prisma.project.findUnique({
+    where:{
+      id
+    }
+  })
+
+  if(project?.clientId!==userId) {
+    return {success:false,message:"Unauthorized"}
+  }
+
+  await prisma.project.delete({
+    where:{id}
+  })
+
+  revalidatePath('/dashboard/client/projects')
+
+  return {
+    success:true,
+    message:"Project deleted successfully"
+  }
+  
+ }
+
+ export async function updateProject(formData: FormData) {
+  const userId = await getUserId(); // get current logged-in user id
+  const id = formData.get("id") as string;
+  const title = formData.get("title") as string;
+  const description = formData.get("description") as string;
+  const budget = Number(formData.get("budget"));
+  const duration = Number(formData.get("duration"));
+  const techStack = (formData.get("techStack") as string)
+    ?.split(",")
+    .map((t) => t.trim());
+  // const status = formData.get("status") as string;
+
+  try {
+    // 🔒 check ownership first
+    const existingProject = await prisma.project.findUnique({
+      where: { id },
+      select: { clientId: true },
+    });
+
+    if (!existingProject) {
+      return { success: false, message: "Project not found" };
+    }
+
+    if (existingProject.clientId !== userId) {
+      return { success: false, message: "Unauthorized: You do not own this project" };
+    }
+
+    // ✅ now update
+   await prisma.project.update({
+      where: { id },
+      data: {
+        title,
+        description,
+        budget,
+        duration,
+        techStack,
+        // status: status as ProjectStatus,
+      },
+    });
+    revalidatePath('/dashboard/client/projects')
+    return { success: true, message:"Project Updated Successfully" };
+  } catch (error) {
+    console.error(error);
+    return { success: false, message: "Failed to update project" };
+  }
+}
+
+
+export async function getProjectById(id: string) { /* optional for view */ }

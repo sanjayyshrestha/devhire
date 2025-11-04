@@ -1,91 +1,88 @@
-'use server'
-
+"use server";
 import { auth, signIn, signOut } from "@/auth";
-import { prisma } from "@/lib/prisma"
+import { uploadImageToCloudinary } from "@/lib/cloudinary";
+import { prisma } from "@/lib/prisma";
+import { Role } from "@prisma/client";
 import bcrypt from "bcryptjs";
-import { redirect } from "next/navigation";
 
-export async function signupUser(formData:FormData){
-  const email=formData.get('email') as string;
-  const password=formData.get('password') as string;
-  const confirmPassword=formData.get('confirmPassword') as string;
-  if(!email || !password) {
-    return{
-      success:false,
-      message:"Both email and password are required"
-    }
+export async function signupUser(formData: FormData) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const confirmPassword = formData.get("confirmPassword") as string;
+  const role = formData.get("role") as string;
+  if (!email || !password) {
+    return {
+      success: false,
+      message: "Both email and password are required",
+    };
   }
-  if(!confirmPassword){
-    return{
-      success:false,
-      message:"Confirm your password"
-    }
+  if (!confirmPassword) {
+    return {
+      success: false,
+      message: "Confirm your password",
+    };
   }
-  if(confirmPassword!==password){
-    return{
-      success:false,
-      message:"Both password should match"
-    }
+  if (confirmPassword !== password) {
+    return {
+      success: false,
+      message: "Both password should match",
+    };
   }
-  const hashedPassword=await bcrypt.hash(password,10);
-  const user=await prisma.user.create({
-    data:{
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = await prisma.user.create({
+    data: {
       email,
-      password:hashedPassword
-    }
-  })
+      password: hashedPassword,
+      role: role as Role,
+    },
+  });
 
- await signIn('credentials',{
-   email,
-   password,
-   redirect:false,
-    })
+  await signIn("credentials", {
+    email,
+    password,
+    redirect: false,
+  });
 
-return {
-  success:true,
-  userId:user.id
-};
+  return {
+    success: true,
+    userId: user.id,
+  };
 }
 
-export async function signinUser(formData:FormData){
-  const email=formData.get('email') as string
-  const password=formData.get('password') as string
+export async function signinUser(formData: FormData) {
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
 
-    try {
-
-  await signIn('credentials',{
-      redirect:false,
-      callbackUrl:'/',
+  try {
+    await signIn("credentials", {
+      redirect: false,
+      callbackUrl: "/",
       email,
-      password
-    })
-      
+      password,
+    });
+
     const user = await prisma.user.findUnique({ where: { email } });
-      return {
-        success: true,
-        role: user?.role,
-      };
-  
-
-
-  } catch (error) {
-    
-    const err=error as Error
-    console.log(err.cause)
-    
     return {
-      success:false
-    }
+      success: true,
+      role: user?.role,
+    };
+  } catch (error) {
+    const err = error as Error;
+    console.log(err.cause);
+
+    return {
+      success: false,
+    };
   }
 
   // redirect('/')
 }
 
-export async function signoutUser(){
-  await signOut()
+export async function signoutUser() {
+  await signOut();
 }
-export async function selectRole(userId:string,role:"DEVELOPER" | "CLIENT"){
-try {
+export async function selectRole(userId: string, role: "DEVELOPER" | "CLIENT") {
+  try {
     await prisma.user.update({
       where: { id: userId },
       data: { role },
@@ -106,16 +103,17 @@ export async function saveUserProfile(formData: FormData) {
       return { success: false, message: "Missing user or role." };
     }
 
-    // Common fields
     const bio = formData.get("bio") as string | null;
 
     if (role === "developer") {
       const name = formData.get("name") as string;
-      const avatar = formData.get("avatar") as string | null;
+      const avatarFile = formData.get("avatar") as File | null;
       const skillsRaw = formData.get("skills") as string | null;
-      const skills = skillsRaw ? skillsRaw.split(",").map(s => s.trim()) : [];
-
-      // Update user role + create or update Developer record
+      const skills = skillsRaw ? skillsRaw.split(",").map((s) => s.trim()) : [];
+      let avatarUrl: string | null = null;
+      if (avatarFile && avatarFile.size > 0) {
+        avatarUrl = await uploadImageToCloudinary(avatarFile);
+      }
       await prisma.user.update({
         where: { id: userId },
         data: {
@@ -125,23 +123,27 @@ export async function saveUserProfile(formData: FormData) {
               create: {
                 name,
                 bio,
-                avatar,
+                avatar: avatarUrl,
                 skills,
               },
               update: {
                 name,
                 bio,
-                avatar,
+                avatar: avatarUrl,
                 skills,
               },
             },
           },
         },
       });
-
     } else if (role === "client") {
       const companyName = formData.get("companyName") as string;
-      const logo = formData.get("logo") as string | null;
+      const logoFile = formData.get("logo") as File | null;
+
+      let logoUrl: string | null = null;
+      if (logoFile && logoFile.size > 0) {
+        logoUrl = await uploadImageToCloudinary(logoFile);
+      }
 
       await prisma.user.update({
         where: { id: userId },
@@ -152,12 +154,12 @@ export async function saveUserProfile(formData: FormData) {
               create: {
                 companyName,
                 bio,
-                logo,
+                logo: logoUrl,
               },
               update: {
                 companyName,
                 bio,
-                logo,
+                logo: logoUrl,
               },
             },
           },
@@ -172,22 +174,24 @@ export async function saveUserProfile(formData: FormData) {
   }
 }
 
-
-
-export async function getRole(){
-  const session=await auth();
-  return session?.user.role
+export async function getRole() {
+  const session = await auth();
+  return session?.user.role;
 }
 
-export async function getUserId(){
-const session=await auth();
-return session?.user.id;
+export async function getUserId() {
+  const session = await auth();
+  return session?.user.id;
 }
 
-export async function getUser(){
-  const session=await auth();
-  return session?.user
+export async function getUser() {
+  const session = await auth();
+  const user = await prisma.user.findUnique({
+    where: { id: session?.user.id },
+    include:{
+      client:true,
+      developer:true
+    }
+  });
+  return user;
 }
-
-
-
