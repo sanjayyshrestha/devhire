@@ -46,7 +46,7 @@ const FeatureSection = () => {
                          rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-xl"
             >
               <CardHeader className="flex flex-col items-start space-y-5 p-8">
-                <div className="h-16 w-16 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
+                <div className="h-16 w-16 rounded-2xl bg-linear-to-tr from-cyan-500 to-blue-500 flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform duration-300">
                   <feature.icon className="h-8 w-8 text-white" />
                 </div>
                 <CardTitle className="text-2xl font-semibold text-white group-hover:text-cyan-400 transition-colors">

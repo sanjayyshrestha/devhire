@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Edit2, Mail, Calendar } from "lucide-react";
+import { Edit2, Mail, Calendar, Camera, Loader2 } from "lucide-react";
 import { ClientProfileData } from "@/app/dashboard/client/profile/page";
 import { updateClientProfileData } from "@/action/client.action";
 import toast from "react-hot-toast";
@@ -19,6 +19,7 @@ export default function ClientProfile({
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [isProfileUpdating, setIsProfileUpdating] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   // ✅ Safely handle nullable user
   const baseProfile = userProfileData?.user
@@ -54,6 +55,14 @@ export default function ClientProfile({
       setEditData(baseProfile);
     }
   }, [userProfileData]);
+
+  // ✅ Image upload handler
+   const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const previewUrl = URL.createObjectURL(file);
+    setEditData((prev) => ({ ...prev, logo: previewUrl }));
+  };
 
   const handleSave = async () => {
     try {
@@ -116,17 +125,45 @@ export default function ClientProfile({
         </div>
 
         {/* Profile Card */}
-        {/* TODO:ADD A FEATURE TO UPDATE CLIENT PROFILE IMAGE  */}
         <Card>
           <CardHeader className="border-b bg-muted/30">
             <div className="flex items-start gap-6">
-              <Avatar className="h-32 w-32 border-4 border-background shadow-lg">
-                <AvatarImage src={profile.logo} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-4xl">
-                  {profile.companyName.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              
+              {/* ✅ Profile Image Upload Feature */}
+              <div className="relative group">
+                <Avatar className="h-32 w-32 border-4 border-background shadow-lg">
+                  <AvatarImage src={editData.logo || profile.logo} />
+                  <AvatarFallback className="bg-primary text-primary-foreground text-4xl">
+                    {profile.companyName.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
 
+                {/* Hover camera icon */}
+                <label
+                  htmlFor="profile-image-upload"
+                  className={`absolute bottom-2 right-2 p-2 rounded-full cursor-pointer bg-primary text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-md hover:bg-primary/80 ${
+                    !isEditing && "hidden"
+                  }`}
+                >
+                  <Camera className="h-4 w-4" />
+                </label>
+
+                <input
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleProfileImageChange}
+                />
+
+                {isUploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
+                    <Loader2 className="h-6 w-6 animate-spin text-white" />
+                  </div>
+                )}
+              </div>
+
+              {/* Company Info */}
               <div className="flex-1 space-y-3">
                 {!isEditing ? (
                   <>
@@ -145,18 +182,16 @@ export default function ClientProfile({
                     </div>
                   </>
                 ) : (
-                  <>
-                    <Input
-                      value={editData.companyName}
-                      onChange={(e) =>
-                        setEditData({
-                          ...editData,
-                          companyName: e.target.value,
-                        })
-                      }
-                      placeholder="Company Name"
-                    />
-                  </>
+                  <Input
+                    value={editData.companyName}
+                    onChange={(e) =>
+                      setEditData({
+                        ...editData,
+                        companyName: e.target.value,
+                      })
+                    }
+                    placeholder="Company Name"
+                  />
                 )}
               </div>
             </div>
@@ -180,11 +215,15 @@ export default function ClientProfile({
             {/* Stats */}
             <div className="grid grid-cols-2 gap-4 pt-4 border-t">
               <div className="text-center p-4 bg-muted/50 rounded-lg">
-                <div className="text-2xl font-bold text-primary">{userProfileData.user._count.project}</div>
+                <div className="text-2xl font-bold text-primary">
+                  {userProfileData.user._count.project}
+                </div>
                 <p className="text-sm text-muted-foreground">Projects Posted</p>
               </div>
               <div className="text-center p-4 bg-muted/50 rounded-lg">
-                <div className="text-2xl font-bold text-primary">{userProfileData.activeProject}</div>
+                <div className="text-2xl font-bold text-primary">
+                  {userProfileData.activeProject}
+                </div>
                 <p className="text-sm text-muted-foreground">Active Projects</p>
               </div>
             </div>

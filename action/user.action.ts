@@ -186,12 +186,15 @@ export async function getUserId() {
 
 export async function getUser() {
   const session = await auth();
+  if (!session?.user?.id) {
+    console.warn("⚠️ No user ID in session");
+    return null; // or throw new Error("Unauthorized");
+  }
+
   const user = await prisma.user.findUnique({
-    where: { id: session?.user.id },
-    include:{
-      client:true,
-      developer:true
-    }
+    where: { id: session.user.id },
+    include: { client: true, developer: true },
   });
+
   return user;
 }

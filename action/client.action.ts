@@ -4,12 +4,13 @@ import { prisma } from "@/lib/prisma";
 import { getRole, getUser, getUserId } from "./user.action"
 import { revalidatePath } from "next/cache";
 import { ProjectStatus } from "@prisma/client";
+import { uploadImageToCloudinary } from "@/lib/cloudinary";
 
 interface UpdateClientProfileInput {
   userId: string;
   bio?: string;
   companyName?: string;
-  logo?: string;
+  logo: string | File;
   location?: string; // if you add this field later
 }
 
@@ -244,18 +245,25 @@ export async function updateClientProfileData({
   logo,
 }: UpdateClientProfileInput) {
   try {
+    let logoUrl:string;
+
+    if(logo instanceof File){
+      logoUrl=await uploadImageToCloudinary(logo);
+    }else{
+      logoUrl=logo
+    }
+
     const updatedProfile = await prisma.client.update({
       where: { userId },
       data: {
         bio,
         companyName,
-        logo,
+        logo:logoUrl,
       },
       include: {
         user: true, // to return user email, createdAt, etc.
       },
     });
-
 
     return {
       success: true,
