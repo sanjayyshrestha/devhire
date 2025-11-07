@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Edit2, Mail, Calendar, X } from "lucide-react";
+import { Edit2, Mail, Calendar, X, Camera, Loader2 } from "lucide-react";
 import { DeveloperProfileData } from "@/app/dashboard/developer/profile/page";
 import { updateDeveloperProfileData } from "@/action/developer.action";
 import toast from "react-hot-toast";
@@ -54,6 +54,7 @@ export default function DeveloperProfile({
   const [editData, setEditData] = useState(baseProfile);
   const [currentSkill, setCurrentSkill] = useState("");
   const [isUpdating,setIsUpdating]=useState(false)
+  const [selectedFile,setSelectedFile]=useState<File | null>(null)
   // Update UI when DB data changes
   useEffect(() => {
     if (userProfileData) {
@@ -62,6 +63,13 @@ export default function DeveloperProfile({
     }
   }, [userProfileData]);
 
+  const handleProfileImageChange=(e:React.ChangeEvent<HTMLInputElement>)=>{
+    const file=e.target.files?.[0];
+    if(!file) return;
+    setSelectedFile(file)
+    const previewUrl=URL.createObjectURL(file);
+    setEditData(prev=>({...prev,avatar:previewUrl}))
+  }
 const handleSave = async () => {
     if (!userProfileData?.user?.id) return;
     try {
@@ -70,7 +78,7 @@ const handleSave = async () => {
         userId: userProfileData.user.id,
         name: editData.name,
         bio: editData.bio,
-        avatar: editData.avatar,
+        avatar: selectedFile || editData.avatar,
         skills: editData.skills,
       });
 
@@ -82,6 +90,7 @@ const handleSave = async () => {
       toast.success(res.message || "Profile updated successfully");
       setProfile(editData);
       setIsEditing(false);
+      setSelectedFile(null);
     } catch (error) {
       console.error(error);
       toast.error("Error updating profile");
@@ -136,12 +145,38 @@ const handleSave = async () => {
         <Card>
           <CardHeader className="border-b bg-muted/30">
             <div className="flex items-start gap-6">
-              <Avatar className="h-32 w-32 border-4 border-background shadow-lg">
-                <AvatarImage src={profile.avatar} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-4xl">
-                  {profile.name.charAt(0).toUpperCase()}
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative group">
+                <Avatar className="h-32 w-32 border-4 border-background shadow-lg">
+                  <AvatarImage src={editData.avatar || profile.avatar} />
+                  <AvatarFallback className="bg-primary text-primary-foreground text-4xl">
+                    {profile.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+
+                {/* Hover camera icon */}
+                <label
+                  htmlFor="profile-image-upload"
+                  className={`absolute bottom-2 right-2 p-2 rounded-full cursor-pointer bg-primary text-primary-foreground opacity-0 group-hover:opacity-100 transition-opacity duration-300 shadow-md hover:bg-primary/80 ${
+                    !isEditing && "hidden"
+                  }`}
+                >
+                  <Camera className="h-4 w-4" />
+                </label>
+
+                <input
+                  id="profile-image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleProfileImageChange}
+                />
+
+                {/* {isUploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full">
+                    <Loader2 className="h-6 w-6 animate-spin text-white" />
+                  </div>
+                )} */}
+              </div>
 
               <div className="flex-1 space-y-3">
                 {!isEditing ? (

@@ -3,11 +3,12 @@
 import { prisma } from "@/lib/prisma"
 import { revalidatePath } from "next/cache";
 import { getRole, getUserId } from "./user.action";
+import { uploadImageToCloudinary } from "@/lib/cloudinary";
 interface UpdateDeveloperProfileInput {
   userId: string;
   name?: string;
   bio?: string;
-  avatar?: string;
+  avatar: string | File;
   skills?: string[];
 }
 
@@ -156,13 +157,19 @@ export async function updateDeveloperProfileData(input: UpdateDeveloperProfileIn
     if (!input.userId) {
       return { success: false, message: "User ID is required" };
     }
+    let avatarUrl:string;
 
+    if(input.avatar instanceof File){
+      avatarUrl= await uploadImageToCloudinary(input.avatar)
+    }else{
+      avatarUrl=input.avatar;
+    }
     const updated = await prisma.developer.update({
       where: { userId: input.userId },
       data: {
         name: input.name,
         bio: input.bio,
-        avatar: input.avatar,
+        avatar: avatarUrl,
         skills: input.skills,
       },
     });
@@ -173,3 +180,4 @@ export async function updateDeveloperProfileData(input: UpdateDeveloperProfileIn
     return { success: false, message: error?.message || "Server error" };
   }
 }
+
