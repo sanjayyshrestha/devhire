@@ -64,6 +64,9 @@ const HeroSection = () => {
                 </div>
               ))}
             </div>
+            <p className="text-md text-slate-400 mt-2 italic text-center">
+  *Stats shown are for demo purposes only.
+</p>
           </div>
 
           {/* Right Section - Hero Visual */}
