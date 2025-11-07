@@ -195,14 +195,7 @@ export default function Auth() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-end">
-                    <a
-                      href="#"
-                      className="text-sm text-cyan-400 hover:text-cyan-300"
-                    >
-                      Forgot password?
-                    </a>
-                  </div>
+                 
                 </CardContent>
 
                 <CardFooter>
