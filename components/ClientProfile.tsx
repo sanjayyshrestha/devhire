@@ -20,7 +20,7 @@ export default function ClientProfile({
   const [isEditing, setIsEditing] = useState(false);
   const [isProfileUpdating, setIsProfileUpdating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
-
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   // ✅ Safely handle nullable user
   const baseProfile = userProfileData?.user
     ? {
@@ -60,6 +60,7 @@ export default function ClientProfile({
    const handleProfileImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    setSelectedFile(file)
     const previewUrl = URL.createObjectURL(file);
     setEditData((prev) => ({ ...prev, logo: previewUrl }));
   };
@@ -71,7 +72,7 @@ export default function ClientProfile({
         userId: profile.userId,
         bio: editData.bio,
         companyName: editData.companyName,
-        logo: editData.logo,
+        logo: selectedFile ||  editData.logo,
       });
 
       if (!res.success) {
@@ -80,6 +81,7 @@ export default function ClientProfile({
         toast.success(res.message);
         setProfile(editData);
         setIsEditing(false);
+        setSelectedFile(null)
       }
     } catch (error) {
       console.error("Error updating client profile:", error);

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Edit2, Mail, Calendar, MapPin, X } from "lucide-react";
+import { Edit2, Mail, Calendar, X } from "lucide-react";
 import { DeveloperProfileData } from "@/app/dashboard/developer/profile/page";
 import { updateDeveloperProfileData } from "@/action/developer.action";
 import toast from "react-hot-toast";
