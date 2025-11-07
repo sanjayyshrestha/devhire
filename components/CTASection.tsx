@@ -4,6 +4,7 @@ import React from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from './ui/button';
 import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 const CTASection = () => {
   return (
      <section className="py-24 relative">
@@ -16,10 +17,18 @@ const CTASection = () => {
               <p className="text-xl text-cyan-50 mb-8 max-w-2xl mx-auto">
                 Join thousands of successful clients and developers building amazing products together
               </p>
-              <Button size="lg" className="bg-white text-blue-600 hover:bg-slate-100 shadow-xl text-lg px-8 py-6 group">
-                Get Started Now
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
+             <Link
+    href="/auth"
+    className="inline-flex items-center gap-1.5 rounded-md
+               bg-linear-to-r from-cyan-500 to-blue-600
+               hover:from-cyan-600 hover:to-blue-700
+               text-white text-lg font-medium
+               px-5 py-2 shadow-sm shadow-cyan-500/30
+               transition-all duration-200 hover:-translate-y-0.5"
+  >
+    Get Started
+    <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+  </Link>
             </CardContent>
           </Card>
         </div>

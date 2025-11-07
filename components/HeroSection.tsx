@@ -1,6 +1,7 @@
 import React from "react";
 import { Code, ArrowRight, Sparkles, Zap, Target, Badge } from "lucide-react";
 import { Button } from "./ui/button";
+import Link from "next/link";
 
 const HeroSection = () => {
   const stats = [
@@ -33,23 +34,22 @@ const HeroSection = () => {
               industry.
             </p>
 
-            <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-              <Button
-                size="lg"
-                className="bg-cyan-500 hover:bg-cyan-600 text-white text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 group transition-all duration-200"
-              >
-                Get Started
-                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
+           <div className="flex justify-center lg:justify-start">
+  <Link
+    href="/auth"
+    className="inline-flex items-center gap-2 rounded-lg
+               bg-linear-to-r from-cyan-500 to-blue-600
+               hover:from-cyan-600 hover:to-blue-700
+               text-white font-medium tracking-wide
+               text-sm sm:text-base px-5 py-2.5 sm:px-6 sm:py-3
+               shadow-md shadow-cyan-500/30 hover:shadow-cyan-600/40
+               transition-all duration-300 ease-in-out transform hover:-translate-y-0.5"
+  >
+    Get Started
+    <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+  </Link>
+</div>
 
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-2 border-white/30 hover:border-cyan-400 hover:border-opacity-60 text-white text-opacity-90 hover:text-white text-base sm:text-lg px-6 sm:px-8 py-4 sm:py-6 transition-all duration-200 bg-white/10 hover:bg-cyan-400/10"
-              >
-                Browse Projects
-              </Button>
-            </div>
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 pt-6 sm:pt-8">
