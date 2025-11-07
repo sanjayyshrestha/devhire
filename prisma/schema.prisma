@@ -45,7 +45,7 @@ model User{
 
 model Developer{
   userId String @id
-  user User @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
   name String
   bio String?
   avatar String?
@@ -57,7 +57,7 @@ model Developer{
 
 model Client{
   userId String @id
-  user User @relation(fields: [userId],references: [id])
+  user User @relation(fields: [userId],references: [id],onDelete: Cascade)
   companyName String
   bio String?
   logo String?
